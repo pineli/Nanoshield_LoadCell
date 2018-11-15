@@ -16,7 +16,7 @@
  * Maximum number of samples that can be used in the moving average filter. This is also the
  * default value.
  */
-#define LOADCELL_MAX_SAMPLES 10
+#define LOADCELL_MAX_SAMPLES 20
 
 /**
  * Timer to use for sampling ADS1230. Timers 1 to 5 are supported.
@@ -62,7 +62,7 @@ class Nanoshield_LoadCell
      * @param calibrate if true, performs ADS1230 offset calibration during initialization.
      */
     void begin(bool calibrate = true);
-    
+
     /**
      * Checks if a new load cell reading is available.
      *
@@ -104,11 +104,19 @@ class Nanoshield_LoadCell
      * @return current weight reading.
      */
     float getWeight();
-    
+
     /**
      * Sets the current value to be the zero-weight value (offset or tare).
      */
     void setZero();
+
+    void setCapacity(float c);
+
+    float getCapacity();
+
+    void setOffset(float o);
+
+    float getOffset();
 
     /**
      * Performs ADS1230 offset calibration.
@@ -118,7 +126,7 @@ class Nanoshield_LoadCell
   private:
     static SPISettings spiSettings;
     static int timeout;
-  
+
     int cs;
     bool newData;
     int32_t offset;
@@ -132,7 +140,7 @@ class Nanoshield_LoadCell
     uint8_t head;
     uint8_t tail;
     int32_t samples[LOADCELL_MAX_SAMPLES];
-    
+
     void readDataIfReady();
     void resetBuffer();
 

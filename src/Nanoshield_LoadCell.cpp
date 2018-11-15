@@ -92,7 +92,7 @@ Nanoshield_LoadCell::Nanoshield_LoadCell(float capacity, float sensitivity, int 
   this->sensitivity = sensitivity;
   this->hiGain = hiGain;
   this->calibrateOnNextCycle = false;
-  
+
   if (numSamples > LOADCELL_MAX_SAMPLES) {
     this->numSamples = LOADCELL_MAX_SAMPLES;
   } else if (numSamples < 1) {
@@ -100,7 +100,7 @@ Nanoshield_LoadCell::Nanoshield_LoadCell(float capacity, float sensitivity, int 
   } else {
     this->numSamples = numSamples;
   }
-  
+
   // Reset circular buffer
   resetBuffer();
 
@@ -120,7 +120,7 @@ void Nanoshield_LoadCell::begin(bool calibrate) {
   digitalWrite(cs, HIGH);
   SPI.begin();
   SPI.usingInterrupt(255);
-  
+
   // Configure timer
   TCCRxA = 0b00000000;
   TCCRxB = TCCRxB_VALUE;
@@ -181,12 +181,28 @@ int32_t Nanoshield_LoadCell::getLatestRawValue() {
   return st;
 }
 
+void Nanoshield_LoadCell::setCapacity(float c) {
+  capacity = c;
+}
+
+float Nanoshield_LoadCell::getCapacity() {
+  return capacity;
+}
+
 float Nanoshield_LoadCell::getWeight() {
   return capacity * getValue() / ((1L << 20) * (hiGain ? 128 : 64) * (sensitivity / 1000));
 }
 
 void Nanoshield_LoadCell::setZero() {
   offset = getRawValue();
+}
+
+void Nanoshield_LoadCell::setOffset(float o) {
+  offset = o;
+}
+
+float Nanoshield_LoadCell::getOffset() {
+  return offset;
 }
 
 void Nanoshield_LoadCell::calibrate() {
@@ -224,14 +240,14 @@ void Nanoshield_LoadCell::readDataIfReady() {
           head = 0;
         }
       }
-      
+
       // Put new sample in the circular buffer tail and add it to the sum
       if (++tail >= numSamples) {
         tail = 0;
       }
       samples[tail] = sample;
       samplesSum += sample;
-      
+
       // Inform there is new data
       newData = true;
     }
